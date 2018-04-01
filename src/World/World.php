@@ -125,9 +125,9 @@ class World
      * Retorna o mundo definido no construtor
      * @return string Mundo
      */
-    public function getWorld()
+    public function __get($name)
     {
-        return $this->world;
+        return $this->$name;
     }
 
     public function __toString()

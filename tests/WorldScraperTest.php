@@ -22,6 +22,15 @@ class WorldScraperTest extends TestCase
         $this->assertInstanceOf(WorldScraper::class, new WorldScraper($otherWorlds));
     }
 
+    public function testCorrectGetFetchDelayInSeconds()
+    {
+        $ws = new WorldScraper();
+        $this->assertEquals(WorldScraper::DEFAULT_FETCH_DELAY, $ws->getFetchDelayInSeconds());
+        $anotherFetchDelay = 10;
+        $ws = new WorldScraper(null, $anotherFetchDelay);
+        $this->assertEquals($anotherFetchDelay, $ws->getFetchDelayInSeconds());
+    }
+
     public function testCanCreateCorrectInstanceWithAllWorlds()
     {
         $ws = new WorldScraper();
@@ -62,8 +71,7 @@ class WorldScraperTest extends TestCase
         $this->assertNotEquals($result1, $result2);
     }
 
-
-    public function testCanFetchAllWorldResults()
+    public function testCanFetchAll()
     {
         $world1 = new World(World::FIDERA);
         $world2 = new World(World::LUMINERA);
@@ -80,5 +88,13 @@ class WorldScraperTest extends TestCase
         foreach($results as $r) {
             $this->assertInstanceOf(WorldResultArray::class, $r);
         }
+    }
+
+    public function testCanFetchAllAllWorlds()
+    {
+        $ws = new WorldScraper();
+        $res = $ws->fetchAll();
+
+        $this->assertTrue(is_array($res));
     }
 }

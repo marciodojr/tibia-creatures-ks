@@ -13,20 +13,25 @@ use DOMElement;
 use Requests\Exception as RequestException;
 
 /**
- * Permite buscar as informações de morte de jogadores e morte de criaturas
+ * Permite buscar as informações de morte de jogadores para criaturas e morte de criaturas por jogadores
  */
 class WorldScraper
 {
     const URL = 'https://secure.tibia.com/community/?subtopic=killstatistics';
+    const DEFAULT_FETCH_DELAY = 2;
+
     private $worldList;
     private $currentFetchIndex;
     private $result;
+    private $fetchDelayInSeconds;
 
     /**
      * Lista de mundos que serão consultados. Se nenhum mundo for informado consulta todos os existentes
+     * 
      * @param WorldArray $chosenWorlds Mundos que serão consultados
+     * @param int $fetchDelayInSeconds Tempo entre fetch()'s ao usar o método fetchAll().
      */
-    public function __construct(WorldArray $chosenWorlds = null)
+    public function __construct(WorldArray $chosenWorlds = null, int $fetchDelayInSeconds = self::DEFAULT_FETCH_DELAY)
     {
         if($chosenWorlds === null) {
             $chosenWorlds = WorldFactory::createAll();
@@ -35,6 +40,7 @@ class WorldScraper
         $this->worldList = $chosenWorlds;
         $this->currentFetchIndex = -1;
         $this->result = [];
+        $this->fetchDelayInSeconds = $fetchDelayInSeconds;
     }
 
     public function fetch()
@@ -44,7 +50,7 @@ class WorldScraper
 
         try {
             $response = Requests::post(self::URL, [], $data = [
-                'world' => $world->getWorld(),
+                'world' => (string)$world,
             ]);
 
             if ($response->success) {
@@ -67,6 +73,7 @@ class WorldScraper
         $length = $this->worldList->count();
         for ($i = 0; $i < $length; $i++) {
             $this->fetch();
+            sleep($this->fetchDelayInSeconds);
         }
         return $this->result;
     }
@@ -95,5 +102,10 @@ class WorldScraper
     public function getWorldList()
     {
         return $this->worldList;
+    }
+
+    public function getFetchDelayInSeconds()
+    {
+        return $this->fetchDelayInSeconds;
     }
 }

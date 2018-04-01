@@ -24,7 +24,7 @@ class WorldTest extends TestCase
     {
         $world = World::ZUNERA;
         $worldObj = new World($world);
-        $this->assertEquals($world, $worldObj->getWorld());
+        $this->assertEquals($world, $worldObj->world);
     }
 
     public function testCanGetAllWorlds()
