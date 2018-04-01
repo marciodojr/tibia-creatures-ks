@@ -25,10 +25,5 @@
         "psr-4": {
             "Mdojr\\Scraper\\": "src/"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "master"
-        }
     }
 }
