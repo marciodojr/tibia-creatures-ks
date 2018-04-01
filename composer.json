@@ -1,0 +1,29 @@
+{
+    "name": "marciodojr/tibia-creatures-ks",
+    "description": "Fetch number of creature deaths from tibia.com",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^7.0"
+    },
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Márcio Dias",
+            "email": "marciojr91@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "scripts": {
+        "test": [
+            "phpunit"
+        ]
+    },
+    "require": {
+        "rmccue/requests": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mdojr\\Scraper\\": "src/"
+        }
+    }
+}
