@@ -3,6 +3,7 @@
 namespace Mdojr\Scraper;
 
 use Mdojr\Scraper\World\WorldArray;
+use Mdojr\Scraper\World\Factory\WorldFactory;
 use Mdojr\Scraper\World\WorldResultArray;
 use Mdojr\Scraper\World\WorldResult;
 use Mdojr\Scraper\Exception\WorldNotLoadedException;
@@ -11,16 +12,26 @@ use DOMDocument;
 use DOMElement;
 use Requests\Exception as RequestException;
 
+/**
+ * Permite buscar as informações de morte de jogadores e morte de criaturas
+ */
 class WorldScraper
 {
     const URL = 'https://secure.tibia.com/community/?subtopic=killstatistics';
-    const WORLD_ALL = 0;
     private $worldList;
     private $currentFetchIndex;
     private $result;
 
-    public function __construct(WorldArray $chosenWorlds)
+    /**
+     * Lista de mundos que serão consultados. Se nenhum mundo for informado consulta todos os existentes
+     * @param WorldArray $chosenWorlds Mundos que serão consultados
+     */
+    public function __construct(WorldArray $chosenWorlds = null)
     {
+        if($chosenWorlds === null) {
+            $chosenWorlds = WorldFactory::createAll();
+        }
+
         $this->worldList = $chosenWorlds;
         $this->currentFetchIndex = -1;
         $this->result = [];
@@ -74,5 +85,15 @@ class WorldScraper
             $res = new WorldResult(trim($fc->textContent, " \t\n\r\0\x0B\xC2\xA0"), (int)$ns->textContent, (int)$ns->nextSibling->textContent);
             $this->result[$this->currentFetchIndex]->append($res);
         }
+    }
+
+    /**
+     * Retorna a lista de mundos informada
+     * 
+     * @return WorldArray Lita de mundos
+     */
+    public function getWorldList()
+    {
+        return $this->worldList;
     }
 }

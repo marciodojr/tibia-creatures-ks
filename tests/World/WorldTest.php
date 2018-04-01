@@ -2,9 +2,9 @@
 
 namespace Mdojr\Scraper\World;
 
-use PHPUnit\Framework\TestCase;
 use Mdojr\Scraper\World\World;
 use Mdojr\Scraper\Exception\InvalidWorldException;
+use PHPUnit\Framework\TestCase;
 
 class WorldTest extends TestCase
 {
@@ -25,5 +25,10 @@ class WorldTest extends TestCase
         $world = World::ZUNERA;
         $worldObj = new World($world);
         $this->assertEquals($world, $worldObj->getWorld());
+    }
+
+    public function testCanGetAllWorlds()
+    {
+        $this->assertTrue(is_array(World::getAllWorlds()));
     }
 }

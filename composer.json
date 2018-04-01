@@ -1,11 +1,11 @@
 {
     "name": "marciodojr/tibia-creatures-ks",
-    "description": "Fetch number of creature deaths from tibia.com",
+    "description": "Load creature deaths and kills from tibia.com",
     "type": "library",
     "require-dev": {
         "phpunit/phpunit": "^7.0"
     },
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Márcio Dias",

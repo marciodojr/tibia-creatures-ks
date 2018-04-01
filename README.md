@@ -27,9 +27,12 @@ $worlds = new WorldArray([
 
 $ws = new WorldScraper($worlds);
 
+// to load all worlds info leave the constructor empty
+//$ws = new WorldScrapper();
+
 // fetch one by one
-$resultWorld1 = $ws->fetch(); 
-$resultWorld2 = $ws->fetch();
+//$resultWorld1 = $ws->fetch(); 
+//$resultWorld2 = $ws->fetch();
 // or simply 
 $results = $ws->fetchAll();
 var_dump($results);

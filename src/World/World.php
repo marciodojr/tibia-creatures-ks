@@ -106,7 +106,7 @@ class World
      */
     private function isWorldValid($world)
     {
-        $validWorlds = $this->getAllWorlds();
+        $validWorlds = self::getAllWorlds();
         return in_array($world, $validWorlds);
     }
 
@@ -115,7 +115,7 @@ class World
      * 
      * @return  array Mundos existentes no formato [WORLD1 => World1, WORLD2 => World2, ...]
      */
-    private function getAllWorlds()
+    public static function getAllWorlds()
     {
         $oClass = new ReflectionClass(__CLASS__);
         return $oClass->getConstants();

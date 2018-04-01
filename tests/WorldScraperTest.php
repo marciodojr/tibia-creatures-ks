@@ -22,6 +22,13 @@ class WorldScraperTest extends TestCase
         $this->assertInstanceOf(WorldScraper::class, new WorldScraper($otherWorlds));
     }
 
+    public function testCanCreateCorrectInstanceWithAllWorlds()
+    {
+        $ws = new WorldScraper();
+        $this->assertInstanceOf(WorldScraper::class, $ws);
+        $this->assertInstanceOf(WorldArray::class, $ws->getWorldList());
+    }
+
     public function testCanFetchWorldResult()
     {
         $world1 = new World(World::FIDERA);
@@ -73,7 +80,5 @@ class WorldScraperTest extends TestCase
         foreach($results as $r) {
             $this->assertInstanceOf(WorldResultArray::class, $r);
         }
-
-        var_dump($results);
     }
 }
