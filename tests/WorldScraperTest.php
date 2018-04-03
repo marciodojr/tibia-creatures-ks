@@ -64,11 +64,10 @@ class WorldScraperTest extends TestCase
         ]);
 
         $ws = new WorldScraper($worlds);
-        $result1 = $ws->fetch();        
-        $this->assertInstanceOf(WorldResultArray::class, $result1);
+        $result1 = $ws->fetch();
         $result2 = $ws->fetch();
+        $this->assertInstanceOf(WorldResultArray::class, $result1);
         $this->assertInstanceOf(WorldResultArray::class, $result2);
-        $this->assertNotEquals($result1, $result2);
     }
 
     public function testCanFetchAll()
@@ -96,5 +95,54 @@ class WorldScraperTest extends TestCase
         $res = $ws->fetchAll();
 
         $this->assertTrue(is_array($res));
+    }
+
+    public function testReturnNullAfterLoadAllWorldResults()
+    {
+        $world1 = new World(World::FIDERA);
+        $world2 = new World(World::LUMINERA);
+
+        $worlds = new WorldArray([
+            $world1,
+            $world2
+        ]);
+
+        $ws = new WorldScraper($worlds);
+        $results = $ws->fetch();
+        $results = $ws->fetch();
+        $this->assertNull($ws->fetch());
+    }
+
+    public function testCanResetFetchIndex()
+    {
+        $world1 = new World(World::FIDERA);
+        $world2 = new World(World::LUMINERA);
+
+        $worlds = new WorldArray([
+            $world1,
+            $world2
+        ]);
+
+        $ws = new WorldScraper($worlds);
+        $results = $ws->fetch();
+        $results = $ws->fetch();
+        $ws->resetCurrentFetchIndex();
+        $this->assertInstanceOf(WorldResultArray::class, $ws->fetch());
+    }
+
+    public function testMultipleFetchAll()
+    {
+        $world1 = new World(World::FIDERA);
+        $world2 = new World(World::LUMINERA);
+
+        $worlds = new WorldArray([
+            $world1,
+            $world2
+        ]);
+
+        $ws = new WorldScraper($worlds);
+
+        $this->assertTrue(is_array($ws->fetchAll()));
+        $this->assertTrue(is_array($ws->fetchAll()));
     }
 }

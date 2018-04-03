@@ -38,14 +38,23 @@ class WorldScraper
         }
 
         $this->worldList = $chosenWorlds;
-        $this->currentFetchIndex = -1;
+        $this->resetCurrentFetchIndex();   
         $this->result = [];
         $this->fetchDelayInSeconds = $fetchDelayInSeconds;
     }
 
+    /**
+     * Carrega as informações do mundo $this->worldList->offsetGet($this->currentFetchIndex)
+     * 
+     * @return WorldResultArray|null Vetor com resultados do mundo ou null caso todos os mundos já tenham sido percorridos.
+     */
     public function fetch()
     {
+        if(($this->currentFetchIndex + 1) == $this->worldList->count()) {
+            return null;
+        }
         $this->currentFetchIndex++;
+        
         $world = $this->worldList->offsetGet($this->currentFetchIndex);
 
         try {
@@ -70,12 +79,18 @@ class WorldScraper
 
     public function fetchAll()
     {
+        $this->resetCurrentFetchIndex();
         $length = $this->worldList->count();
         for ($i = 0; $i < $length; $i++) {
             $this->fetch();
             sleep($this->fetchDelayInSeconds);
         }
         return $this->result;
+    }
+
+    public function resetCurrentFetchIndex()
+    {
+        $this->currentFetchIndex = -1;
     }
 
     private function parseTableData(DOMDocument $table)
