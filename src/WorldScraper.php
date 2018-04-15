@@ -7,9 +7,10 @@ use Mdojr\Scraper\World\Factory\WorldFactory;
 use Mdojr\Scraper\World\WorldResultArray;
 use Mdojr\Scraper\World\WorldResult;
 use Mdojr\Scraper\Exception\WorldNotLoadedException;
-use Requests;
+use Requests_Session;
 use DOMDocument;
-use DOMElement;
+use DOMXPath;
+use DOMNodeList;
 use Requests\Exception as RequestException;
 
 /**
@@ -24,6 +25,7 @@ class WorldScraper
     private $currentFetchIndex;
     private $result;
     private $fetchDelayInSeconds;
+    private $session;
 
     /**
      * Lista de mundos que serão consultados. Se nenhum mundo for informado consulta todos os existentes
@@ -31,16 +33,17 @@ class WorldScraper
      * @param WorldArray $chosenWorlds Mundos que serão consultados
      * @param int $fetchDelayInSeconds Tempo entre fetch()'s ao usar o método fetchAll().
      */
-    public function __construct(WorldArray $chosenWorlds = null, int $fetchDelayInSeconds = self::DEFAULT_FETCH_DELAY)
+    public function __construct(Requests_Session $rs, WorldArray $chosenWorlds = null, int $fetchDelayInSeconds = self::DEFAULT_FETCH_DELAY)
     {
         if($chosenWorlds === null) {
             $chosenWorlds = WorldFactory::createAll();
         }
 
         $this->worldList = $chosenWorlds;
-        $this->resetCurrentFetchIndex();   
+        $this->resetCurrentFetchIndex();
         $this->result = [];
         $this->fetchDelayInSeconds = $fetchDelayInSeconds;
+        $this->session = $rs;
     }
 
     /**
@@ -56,16 +59,18 @@ class WorldScraper
         $this->currentFetchIndex++;
         
         $world = $this->worldList->offsetGet($this->currentFetchIndex);
+        $dom = new DOMDocument();
 
         try {
-            $response = Requests::post(self::URL, [], $data = [
+            $response = $this->session->post(self::URL, [], $data = [
                 'world' => (string)$world,
             ]);
 
             if ($response->success) {
-                $rawTable = strstr(strstr($response->body, '<TABLE BORDER=0 CELLSPACING=1 CELLPADDING=3 WIDTH=100%>'), '</TABLE>', true) . "</table>";
-                @$table = DOMDocument::loadHTML($rawTable);
-                $this->parseTableData($table);
+                @$dom->loadHTML($response->body);
+                $finder = new DOMXPath($dom);
+                $nodes = $finder->query('(//table)[5]/tr/td/text()');
+                $this->parseTableData($nodes);
             } else {
                 throw new WorldNotLoadedException("Unable to load world information status $response->status_code",  null);
             }
@@ -93,19 +98,15 @@ class WorldScraper
         $this->currentFetchIndex = -1;
     }
 
-    private function parseTableData(DOMDocument $table)
+    private function parseTableData(DOMNodeList $list)
     {
-        $rows = $table->firstChild->nextSibling->firstChild->firstChild;
-        $rows->removeChild($rows->firstChild);
-        $rows->removeChild($rows->firstChild);
-        $rows->removeChild($rows->lastChild);
-
         $this->result[$this->currentFetchIndex] = new WorldResultArray();
-        foreach ($rows->childNodes as $tr) {
-            $fc = $tr->firstChild;
-            $ns = $fc->nextSibling;
-            $res = new WorldResult(trim($fc->textContent, " \t\n\r\0\x0B\xC2\xA0"), (int)$ns->textContent, (int)$ns->nextSibling->textContent);
-            $this->result[$this->currentFetchIndex]->append($res);
+        for($i = 0; $i < $list->length; $i += 5) {
+            $creatureName = trim($list->item($i)->textContent, " \t\n\r\0\x0B\xC2\xA0");
+            $killedPlayers = (int)$list->item($i + 1)->textContent;
+            $killedByPlayers = (int)$list->item($i + 2)->textContent;
+
+            $this->result[$this->currentFetchIndex]->append(new WorldResult($creatureName, $killedPlayers, $killedByPlayers));
         }
     }
 

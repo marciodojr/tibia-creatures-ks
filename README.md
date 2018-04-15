@@ -16,6 +16,7 @@ use Mdojr\Scraper\WorldScraper;
 use Mdojr\Scraper\World\WorldArray;
 use Mdojr\Scraper\World\WorldResultArray;
 use Mdojr\Scraper\World\World;
+use Requests_Session;
 
 $world1 = new World(World::FIDERA);
 $world2 = new World(World::LUMINERA);
@@ -25,10 +26,13 @@ $worlds = new WorldArray([
     $world2
 ]);
 
-$ws = new WorldScraper($worlds);
+$rs = new Requests_Session();
 
-// to load all worlds info leave the constructor empty
-//$ws = new WorldScraper();
+$ws = new WorldScraper($rs, $worlds);
+
+
+// to load all worlds info pass only the Requests_Session instance
+//$ws = new WorldScraper($rs);
 
 // fetch one by one
 //$resultWorld1 = $ws->fetch(); 
@@ -77,6 +81,7 @@ var_dump($results);
 ```
 composer test
 ```
+set the env variable RREQUEST to 1 (`export RREQUEST=1`) to test real requests
 
 ## License 
 MIT
